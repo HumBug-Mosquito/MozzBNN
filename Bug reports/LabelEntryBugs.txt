@@ -1,0 +1,11 @@
+Signal:
+Label duration of 0.0 seconds at path  '/Thai/sounds/18 June 2018_251cow.wav' ... Saving index 1560 to idx.
+
+Noise:
+Label duration of 0.0 seconds at path  '/Thai/sounds/larvae_#12-20_rec1.wav' ... Saving index 933 to idx.
+Label duration of 0.0 seconds at path  '/Thai/sounds/larvae_#12-20_rec1.wav' ... Saving index 935 to idx.
+Label duration of 0.0 seconds at path  '/Thai/sounds/larvae_#12-20_rec1.wav' ... Saving index 936 to idx.
+Label duration of 0.0 seconds at path  '/Thai/sounds/larvae_#12-20_rec1.wav' ... Saving index 938 to idx.
+
+Browsing through a few of these fine "noise" labels, many appear to contain some mosquito in the trailing parts.
+" '/Culex/sounds/R4_cleaned recording_16-10-17.wav'": 5 second label: last second incorrect
