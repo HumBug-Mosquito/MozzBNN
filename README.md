@@ -17,14 +17,14 @@ Once queried, one needs to copy the files from the database that are relevant to
 
 1. `ssh` into `humbug.ac.uk`.
 2. From any directory, for example the `/home/*user_name*` directory, execute the command
->`python3 /data/access/access.py SELECT label.id,
+>`python3 /data/access/access.py "SELECT label.id,
 audio_id, fine_start_time, fine_end_time, species, sound_type, path
 FROM label
 LEFT JOIN mosquito
 ON (label.mosquito_id = mosquito.id)
 RIGHT JOIN audio
 ON (label.audio_id = audio.id)
-WHERE sound_type = 'mosquito' AND type = 'Fine' AND species IS NOT NULL; > fine_mosquito.csv`
+WHERE sound_type = 'mosquito' AND type = 'Fine' AND species IS NOT NULL;" > fine_mosquito.csv`
 3. On Linux/Mac, copy, via `scp` or `rsync` the results of the query, which are stored in `fine_mosquito.csv` to your local machine as follows:
 `scp humbug.ac.uk:/home/*user_name*/fine_mosquito.csv .` On Windows you may either use a Linux-like emulator to run unix commands, or use an FTP such as WinSCP to establish a connection to the HumBug server, and then use the GUI for file transfer.
 
