@@ -1,0 +1,6 @@
+webrtcvad
+librosa
+soundfile
+pyloudnorm
+numpy
+matplotlib
