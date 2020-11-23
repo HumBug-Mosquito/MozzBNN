@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import librosa
 import numpy as np
+import skimage.util
 
 
 # Dataframe processing and File i/o
@@ -99,15 +100,25 @@ def get_noise_wav_for_df(df, path_strings, crop_time, sr, verbose=0):
 
 # Feature processing with Librosa
 
-def get_feat(x, sr, flatten=True):
-    ''' Returns features extracted with Librosa. Currently written to support MFCCs only. flatten=True
+def get_feat(x, sr, feat_type, flatten=True):
+    ''' Returns features extracted with Librosa. Currently written to support MFCCs (truncated), MFCCs, and log-mel only. flatten=True
     returns a continguous list of all the features from different recordings concatenated, whereas flatten=False returns
     a list of features, with the number of items equal to the number of input recordings'''
     X = []
     n_samples = 0
     for audio in x:
         if len(audio) > 0:
-            feat = librosa.feature.mfcc(y=np.array(audio), sr=sr, n_mfcc=13)
+            if feat_type == 'mfcc':
+                feat = librosa.feature.mfcc(y=np.array(audio), sr=sr, n_mfcc=13)
+            elif feat_type == 'mfcc-cut':
+                feat = librosa.feature.mfcc(y=np.array(audio), sr=sr, n_mfcc=20)[2:]
+            elif feat_type == 'log-mel':
+                feat = librosa.feature.melspectrogram(y=np.array(audio), sr=sr, n_mels=40)
+                # Added case to present features in decibels:
+                feat = librosa.power_to_db(feat, ref=np.max)
+            else:
+                raise Exception('Feature type of log-mel, mfcc-cut, or mfcc only supported.')
+
             X.append(feat)
             n_samples += np.shape(feat)[1]
 
@@ -121,6 +132,69 @@ def get_feat(x, sr, flatten=True):
         return X_flatten.T
     else:
         return X
+
+
+def reshape_feat(feats, win_size, step_size):
+    '''Reshaping features from get_feat to be compatible for classifiers expecting a 2D slice as input. Parameter `win_size` is 
+    given in number of feature windows. Can code to be a function of time and hop length instead in future.'''
+    
+    feats_windowed_array = []
+    for feat in feats:
+        if np.shape(feat)[1] < win_size:
+            pass
+        else:
+            feats_windowed = skimage.util.view_as_windows(feat.T, (win_size,np.shape(feat)[0]), step=step_size)
+            feats_windowed_array.append(feats_windowed)
+    return np.vstack(feats_windowed_array)
+
+
+
+
+
+# Return predicted sections in time from features:
+
+
+def detect_timestamps(preds_prob, hop_length=512, sr=8000):
+
+    preds = np.zeros(len(preds_prob))
+    for i, pred in enumerate(preds_prob):
+        if pred[1] > 0.5:
+            preds[i] = 1
+
+
+    frames = librosa.frames_to_samples(np.arange(len(preds)), hop_length=512)  
+    sample_start = 0
+    prob_start_idx = 0
+    preds_list = []
+    # mozz_pred_array = []
+    for index, frame in enumerate(frames[:-1]):
+        if preds[index] != preds[index+1]:
+            sample_end = frames[index+1]
+            prob_end_idx = index+1
+            # print('sample_start', sample_start, prob_start_idx, 
+            #  'sample_end', sample_end, prob_end_idx, 'label', preds[index])
+            if preds[index] == 1:
+                preds_list.append([sample_start/sr, sample_end/sr, np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])])
+            sample_start = frames[index+1]  
+            prob_start_idx = index+1     
+
+        elif index+1 == len(frames[:-1]):
+            sample_end = frames[index+1]
+            prob_end_idx = index+1 
+            # print('sample_start', sample_start, 'sample_end', sample_end, 'label', preds[index])
+            if preds[index] == 1:
+                preds_list.append([sample_start/sr, sample_end/sr, np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])])
+            sample_start = frames[index+1]       
+            prob_start_idx = index+1 
+    return preds_list
+
+
+
+
+
+
+
+
 
 
 # Further evaluation and visualisation
