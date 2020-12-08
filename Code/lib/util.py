@@ -100,7 +100,7 @@ def get_noise_wav_for_df(df, path_strings, crop_time, sr, verbose=0):
 
 # Feature processing with Librosa
 
-def get_feat(x, sr, feat_type, flatten=True):
+def get_feat(x, sr, feat_type, n_feat, flatten=True):
     ''' Returns features extracted with Librosa. Currently written to support MFCCs (truncated), MFCCs, and log-mel only. flatten=True
     returns a continguous list of all the features from different recordings concatenated, whereas flatten=False returns
     a list of features, with the number of items equal to the number of input recordings'''
@@ -109,11 +109,11 @@ def get_feat(x, sr, feat_type, flatten=True):
     for audio in x:
         if len(audio) > 0:
             if feat_type == 'mfcc':
-                feat = librosa.feature.mfcc(y=np.array(audio), sr=sr, n_mfcc=13)
+                feat = librosa.feature.mfcc(y=np.array(audio), sr=sr, n_mfcc=n_feat)
             elif feat_type == 'mfcc-cut':
-                feat = librosa.feature.mfcc(y=np.array(audio), sr=sr, n_mfcc=20)[2:]
+                feat = librosa.feature.mfcc(y=np.array(audio), sr=sr, n_mfcc=n_feat)[2:]
             elif feat_type == 'log-mel':
-                feat = librosa.feature.melspectrogram(y=np.array(audio), sr=sr, n_mels=40)
+                feat = librosa.feature.melspectrogram(y=np.array(audio), sr=sr, n_mels=n_feat)
                 # Added case to present features in decibels:
                 feat = librosa.power_to_db(feat, ref=np.max)
             else:
@@ -154,7 +154,43 @@ def reshape_feat(feats, win_size, step_size):
 # Return predicted sections in time from features:
 
 
-def detect_timestamps(preds_prob, hop_length=512, sr=8000):
+def detect_timestamps(preds_prob, hop_length=512, det_threshold = 0.5, sr=8000):
+
+    preds = np.zeros(len(preds_prob))
+    for i, pred in enumerate(preds_prob):
+        if pred[1] > det_threshold:
+            preds[i] = 1
+
+
+    frames = librosa.frames_to_samples(np.arange(len(preds)), hop_length=512)  
+    sample_start = 0
+    prob_start_idx = 0
+    preds_list = []
+    # mozz_pred_array = []
+    for index, frame in enumerate(frames[:-1]):
+        if preds[index] != preds[index+1]:
+            sample_end = frames[index+1]
+            prob_end_idx = index+1
+            # print('sample_start', sample_start, prob_start_idx, 
+            #  'sample_end', sample_end, prob_end_idx, 'label', preds[index])
+            if preds[index] == 1:
+                preds_list.append([sample_start/sr, sample_end/sr, "{:.2f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1]))])
+            sample_start = frames[index+1]  
+            prob_start_idx = index+1     
+
+        elif index+1 == len(frames[:-1]):
+            sample_end = frames[index+1]
+            prob_end_idx = index+1 
+            # print('sample_start', sample_start, 'sample_end', sample_end, 'label', preds[index])
+            if preds[index] == 1:
+                preds_list.append([sample_start/sr, sample_end/sr, "{:.2f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1]))])
+            sample_start = frames[index+1]       
+            prob_start_idx = index+1 
+    return preds_list
+
+
+
+def detect_timestamps_BNN(preds_prob, G_X, U_X, hop_length=512, sr=8000):
 
     preds = np.zeros(len(preds_prob))
     for i, pred in enumerate(preds_prob):
@@ -174,7 +210,10 @@ def detect_timestamps(preds_prob, hop_length=512, sr=8000):
             # print('sample_start', sample_start, prob_start_idx, 
             #  'sample_end', sample_end, prob_end_idx, 'label', preds[index])
             if preds[index] == 1:
-                preds_list.append([sample_start/sr, sample_end/sr, np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])])
+                preds_list.append([str(sample_start/sr), str(sample_end/sr),
+                                   "{:.2f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])) +
+                                  " PE: " + "{:.2f}".format(np.mean(G_X[prob_start_idx:prob_end_idx])) + 
+                                  " MI: " + "{:.2f}".format(np.mean(U_X[prob_start_idx:prob_end_idx]))])
             sample_start = frames[index+1]  
             prob_start_idx = index+1     
 
@@ -183,7 +222,10 @@ def detect_timestamps(preds_prob, hop_length=512, sr=8000):
             prob_end_idx = index+1 
             # print('sample_start', sample_start, 'sample_end', sample_end, 'label', preds[index])
             if preds[index] == 1:
-                preds_list.append([sample_start/sr, sample_end/sr, np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])])
+                preds_list.append([str(sample_start/sr), str(sample_end/sr),
+                                   "{:.2f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])) +
+                                  " PE: " + "{:.2f}".format(np.mean(G_X[prob_start_idx:prob_end_idx])) + 
+                                  " MI: " + "{:.2f}".format(np.mean(U_X[prob_start_idx:prob_end_idx]))])       
             sample_start = frames[index+1]       
             prob_start_idx = index+1 
     return preds_list
@@ -193,6 +235,40 @@ def detect_timestamps(preds_prob, hop_length=512, sr=8000):
 
 
 
+
+
+
+
+# Bayesian Neural Network
+
+def active_BALD(out, X, n_classes):
+
+    log_prob = np.zeros((out.shape[0], X.shape[0], n_classes))
+    score_All = np.zeros((X.shape[0], n_classes))
+    All_Entropy = np.zeros((X.shape[0],))
+    for d in range(out.shape[0]):
+#         print ('Dropout Iteration', d)
+#         params = unflatten(np.squeeze(out[d]),layer_sizes,nn_weight_index)
+        log_prob[d] = out[d]
+        soft_score = np.exp(log_prob[d])
+        score_All = score_All + soft_score
+        #computing F_X
+        soft_score_log = np.log2(soft_score+10e-15)
+        Entropy_Compute = - np.multiply(soft_score, soft_score_log)
+        Entropy_Per_samp = np.sum(Entropy_Compute, axis=1)
+        All_Entropy = All_Entropy + Entropy_Per_samp
+ 
+    Avg_Pi = np.divide(score_All, out.shape[0])
+    Log_Avg_Pi = np.log2(Avg_Pi+10e-15)
+    Entropy_Avg_Pi = - np.multiply(Avg_Pi, Log_Avg_Pi)
+    Entropy_Average_Pi = np.sum(Entropy_Avg_Pi, axis=1)
+    G_X = Entropy_Average_Pi
+    Average_Entropy = np.divide(All_Entropy, out.shape[0])
+    F_X = Average_Entropy
+    U_X = G_X - F_X
+# G_X = predictive entropy
+# U_X = MI
+    return G_X, U_X, log_prob
 
 
 
