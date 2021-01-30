@@ -190,11 +190,11 @@ def detect_timestamps(preds_prob, hop_length=512, det_threshold = 0.5, sr=8000):
 
 
 
-def detect_timestamps_BNN(preds_prob, G_X, U_X, hop_length=512, sr=8000):
+def detect_timestamps_BNN(preds_prob, G_X, U_X, hop_length=512, det_threshold=0.5, sr=8000):
 
     preds = np.zeros(len(preds_prob))
     for i, pred in enumerate(preds_prob):
-        if pred[1] > 0.5:
+        if pred[1] > det_threshold:
             preds[i] = 1
 
 
