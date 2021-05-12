@@ -211,9 +211,9 @@ def detect_timestamps_BNN(preds_prob, G_X, U_X, hop_length=512, det_threshold=0.
             #  'sample_end', sample_end, prob_end_idx, 'label', preds[index])
             if preds[index] == 1:
                 preds_list.append([str(sample_start/sr), str(sample_end/sr),
-                                   "{:.2f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])) +
-                                  " PE: " + "{:.2f}".format(np.mean(G_X[prob_start_idx:prob_end_idx])) + 
-                                  " MI: " + "{:.2f}".format(np.mean(U_X[prob_start_idx:prob_end_idx]))])
+                                   "{:.4f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])) +
+                                  " PE: " + "{:.4f}".format(np.mean(G_X[prob_start_idx:prob_end_idx])) + 
+                                  " MI: " + "{:.4f}".format(np.mean(U_X[prob_start_idx:prob_end_idx]))])
             sample_start = frames[index+1]  
             prob_start_idx = index+1     
 
@@ -223,9 +223,9 @@ def detect_timestamps_BNN(preds_prob, G_X, U_X, hop_length=512, det_threshold=0.
             # print('sample_start', sample_start, 'sample_end', sample_end, 'label', preds[index])
             if preds[index] == 1:
                 preds_list.append([str(sample_start/sr), str(sample_end/sr),
-                                   "{:.2f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])) +
-                                  " PE: " + "{:.2f}".format(np.mean(G_X[prob_start_idx:prob_end_idx])) + 
-                                  " MI: " + "{:.2f}".format(np.mean(U_X[prob_start_idx:prob_end_idx]))])       
+                                   "{:.4f}".format(np.mean(preds_prob[prob_start_idx:prob_end_idx][:,1])) +
+                                  " PE: " + "{:.4f}".format(np.mean(G_X[prob_start_idx:prob_end_idx])) + 
+                                  " MI: " + "{:.4f}".format(np.mean(U_X[prob_start_idx:prob_end_idx]))])       
             sample_start = frames[index+1]       
             prob_start_idx = index+1 
     return preds_list
