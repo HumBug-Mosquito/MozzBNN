@@ -97,8 +97,8 @@ if __name__ == "__main__":
     parser.add_argument("rootFolderPath", help="Source destination of audio files. Can be a parent directory.")
     parser.add_argument("audio_format", help="Any file format supported by librosa load.")
     parser.add_argument("--dir_out", help="Output directory. If not specified, predictions are output to the same folder as source.")
-    parser.add_argument("--win_size", help="Window size.")
-    parser.add_argument("--step_size", help="Step size.")
+    parser.add_argument("--win_size", default=40, type=int, help="Window size.")
+    parser.add_argument("--step_size", default=40, type=int, help="Step size.")
 
 
     # dir_out=None, det_threshold=0.5, n_samples=10, feat_type='log-mel',n_feat=128, win_size=40, step_size=40,
@@ -111,9 +111,6 @@ if __name__ == "__main__":
     dir_out = args.dir_out
     win_size = args.win_size
     step_size = args.step_size
-    if args.win_size:
-    	win_size = int(args.win_size)
-    if args.step_size:
-    	step_size = int(args.step_size)
+
 
     write_output(rootFolderPath, audio_format, dir_out=dir_out, win_size=win_size, step_size=step_size)
