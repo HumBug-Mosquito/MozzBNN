@@ -109,6 +109,8 @@ if __name__ == "__main__":
     rootFolderPath = args.rootFolderPath
     audio_format = args.audio_format
     dir_out = args.dir_out
+    win_size = args.win_size
+    step_size = args.step_size
     if args.win_size:
     	win_size = int(args.win_size)
     if args.step_size:
