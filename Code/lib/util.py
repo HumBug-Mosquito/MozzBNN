@@ -52,6 +52,15 @@ def get_wav_for_path(noise_path_names, sr):
         signal_length += len(signal)/sr
     return x, signal_length
 
+def get_wav_for_path_pipeline(path_names, sr):
+    x = []
+    signal_length = 0
+    for path in path_names:
+#         print(path)
+        signal, _ = librosa.load(path, sr=sr)
+        x.append(signal)
+        signal_length += len(signal)/sr
+    return x, signal_length
 
 def get_noise_wav_for_df(df, path_strings, crop_time, sr, verbose=0):
     ''' Logic: If any wav file has a positive label, the unlabelled wav file is negative. 
@@ -191,7 +200,11 @@ def detect_timestamps(preds_prob, hop_length=512, det_threshold = 0.5, sr=8000):
 
 
 def detect_timestamps_BNN(preds_prob, G_X, U_X, hop_length=512, det_threshold=0.5, sr=8000):
-
+    ''' Outputs the mean probability per section of predicted audio: consider the case when many
+    consecutive windows are positive, we only get to see the average output. When then thresholding the output
+    by probability, it may be better to have individual windows so that we can filter out more likely events. However,
+    if we want to keep longer complete sections of audio, this may be sufficient (given the already large window size of 
+    2.56s'''
     preds = np.zeros(len(preds_prob))
     for i, pred in enumerate(preds_prob):
         if pred[1] > det_threshold:
