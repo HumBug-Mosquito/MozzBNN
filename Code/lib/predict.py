@@ -7,8 +7,8 @@ from tensorflow import keras
 import argparse
 import matplotlib.pyplot as plt
 
-def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5, n_samples=10, feat_type='log-mel',n_feat=128, win_size=40, step_size=40,
-                 n_hop=512, sr=8000, norm=False, debug=False, to_filter=False, plot=None):
+def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5, n_samples=10, feat_type='log-mel',n_feat=128, win_size=30, step_size=30,
+                 n_hop=512, sr=8000, norm_per_sample=True, debug=False, to_filter=False, plot=None):
 
         '''dir_out = None if we want to save files in the same folder that we read from.
            det_threshold=0.5 determines the threshold above which an event is classified as positive. See detect_timestamps for 
@@ -17,20 +17,22 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
         # audio_format = '.wav'
 
 
-
-
-
-        model = keras.models.load_model('../models/BNN/Win_40_Stride_5_CNN_log-mel_128_norm_Falseheld_out_test_manual_v2_low_epoch.h5',
-                                       custom_objects={"dropout": 0.2})
-        model_name = 'held_out_test_manual_v2_low_epoch'
-
+       # model = keras.models.load_model('../models/BNN/Win_40_Stride_5_CNN_log-mel_128_norm_Falseheld_out_test_manual_v2_low_epoch.h5',
+       #                                custom_objects={"dropout": 0.2})
+       # model_name = 'held_out_test_manual_v2_low_epoch'
+        model = keras.models.load_model('../models/BNN/neurips_2021_humbugdb_keras_bnn_best.hdf5', custom_objects={"dropout": 0.2})
+        model_name = 'neurips_2021_humbugdb_keras_bnn_best'
         mozz_audio_list = []
-
+        
+        print('Processing:', rootFolderPath, 'for audio format:', audio_format)
+        print(type(audio_format))
+        print(type('.wav'))
+        if audio_format == '.wav':
+            print('yes')
         i_signal = 0
         for root, dirs, files in os.walk(rootFolderPath):
-            for filename in files:
-
-                if audio_format in filename:
+            for filename in files:	
+                if filename.endswith(audio_format):
                     print(root, filename) 
                     i_signal+=1
             
@@ -41,12 +43,9 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
                         print('Signal length too short, skipping:', x_l, filename) 
                     else:
             #             
-                        X_CNN = util.get_feat(x, sr=8000, feat_type=feat_type, n_feat=n_feat, flatten = False)
+                        X_CNN = util.get_feat(x, sr=8000, feat_type=feat_type, n_feat=n_feat,norm_per_sample=norm_per_sample, flatten = False)
 
                         X_CNN = util.reshape_feat(X_CNN, win_size=win_size, step_size=step_size)
-            #             X_CNN = (X_CNN - mean)/std
-            #             print(np.shape(X_CNN))
-
                         out = []
                         for i in range(n_samples):
                             out.append(model.predict(X_CNN))
@@ -75,6 +74,8 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
 
                         if dir_out:
                             root_out = root.replace(rootFolderPath, dir_out)
+                        else:
+                            root_out = root
                         print('dir_out', root_out, 'filename', filename)
   
 
@@ -103,8 +104,9 @@ if __name__ == "__main__":
     parser.add_argument("audio_format", help="Any file format supported by librosa load.")
     parser.add_argument("--dir_out", help="Output directory. If not specified, predictions are output to the same folder as source.")
     parser.add_argument("--plot", help="Save figure of predictions to same directory as dictated by dir_out.")
-    parser.add_argument("--win_size", default=40, type=int, help="Window size.")
-    parser.add_argument("--step_size", default=40, type=int, help="Step size.")
+    parser.add_argument("--norm", default=True, help="Normalise feature windows with respect to themsleves.")
+    parser.add_argument("--win_size", default=30, type=int, help="Window size.")
+    parser.add_argument("--step_size", default=30, type=int, help="Step size.")
 
 
     # dir_out=None, det_threshold=0.5, n_samples=10, feat_type='log-mel',n_feat=128, win_size=40, step_size=40,
@@ -118,6 +120,7 @@ if __name__ == "__main__":
     plot = args.plot
     win_size = args.win_size
     step_size = args.step_size
+    norm_per_sample=args.norm
 
 
-    write_output(rootFolderPath, audio_format, dir_out=dir_out, win_size=win_size, step_size=step_size, plot=plot)
+    write_output(rootFolderPath, audio_format, dir_out=dir_out, norm_per_sample=norm_per_sample, win_size=win_size, step_size=step_size, plot=plot)
