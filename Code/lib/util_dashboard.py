@@ -7,7 +7,7 @@ import librosa
 
 # Change plot properties
 
-mpl.COLOR = 'white'
+COLOR = 'white'
 mpl.rcParams['text.color'] = COLOR
 mpl.rcParams['axes.labelcolor'] = COLOR
 mpl.rcParams['xtick.color'] = COLOR
@@ -24,10 +24,9 @@ def plot_mozz_MI(X_CNN, y, MI, p_threshold, root_out, filename, out_format='.png
     '''
     pos_pred_idx = np.where(y>p_threshold)[0]
 
-    fig, axs = plt.subplots(2, sharex=True, figsize=(10*(1000/720),5*(500/360)), gridspec_kw={
+    fig, axs = plt.subplots(2, sharex=True, figsize=(10,5), gridspec_kw={
            'width_ratios': [1],
            'height_ratios': [2,1]})
-    fig.patch.set_facecolor('#485563')
     # x_lims = mdates.date2num(T)
     # date_format = mdates.DateFormatter('%M:%S')
     # axs[0].xaxis_date()
@@ -109,7 +108,7 @@ def write_video_for_dash(filename_image, filename_mozz_audio, mozz_audio_length,
     ffmpeg_command = 'ffmpeg -framerate 24 -loop 1 -y -i ' + '"' +filename_image+ '"' + ' -i ' + '"' +filename_mozz_audio+ '"'\
     + ' -t ' + str(mozz_audio_length) + ' -filter_complex \"color=c=red:s=945x4[bar];[0][bar]overlay=-(w-2)+(w/' \
     + str(mozz_audio_length) + ')*t:300:shortest=1\" \
-    -c:a aac -vbr 3  -framerate 24 -vcodec libx264 -shortest -pix_fmt yuv420p ' + '"' \
+    -c:a aac -b:a 32k -framerate 24 -vcodec libx264 -pix_fmt yuv420p  -color_primaries smpte170m -color_trc smpte170m -colorspace smpte170m -shortest ' + '"' \
     + os.path.join(dir_out, output_filename) + '_mozz_pred.mp4' + '"' 
     
     os.system(ffmpeg_command)
