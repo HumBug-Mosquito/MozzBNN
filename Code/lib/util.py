@@ -109,10 +109,11 @@ def get_noise_wav_for_df(df, path_strings, crop_time, sr, verbose=0):
 
 # Feature processing with Librosa
 
-def get_feat(x, sr, feat_type, n_feat, flatten=True):
+def get_feat(x, sr, feat_type, n_feat, flatten=True, norm_per_sample=True):
     ''' Returns features extracted with Librosa. Currently written to support MFCCs (truncated), MFCCs, and log-mel only. flatten=True
     returns a continguous list of all the features from different recordings concatenated, whereas flatten=False returns
-    a list of features, with the number of items equal to the number of input recordings'''
+    a list of features, with the number of items equal to the number of input recordings. Norm_per_sample normalises each spectogram
+    relative to itself, set to True for models trained with this normalisation, and False otherwise.'''
     X = []
     n_samples = 0
     for audio in x:
@@ -127,7 +128,8 @@ def get_feat(x, sr, feat_type, n_feat, flatten=True):
                 feat = librosa.power_to_db(feat, ref=np.max)
             else:
                 raise Exception('Feature type of log-mel, mfcc-cut, or mfcc only supported.')
-
+            if norm_per_sample:
+                feat = (feat-np.mean(feat))/np.std(feat) 
             X.append(feat)
             n_samples += np.shape(feat)[1]
 
