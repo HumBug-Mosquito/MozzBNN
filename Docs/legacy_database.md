@@ -1,7 +1,5 @@
 # DatabaseAccess
 
-# HumBug Database
-
 This repo includes detailed instructions for how to query data from the existing HumBug database, and use the data to generate features.
 
 ## Database access
@@ -32,4 +30,9 @@ WHERE sound_type = 'mosquito' AND type = 'Fine' AND species IS NOT NULL;" > fine
 
 ## Jupyter notebook documentation
 
-The notebook is split into three themes: data i/o, data filtering and label conversion, and classification and evaluation. Please see the notebook for the latest documentation on why certain label conversion is necessary for a particular experiment.
+The notebook is split into three themes:
+* Data i/o, data filtering and label conversion
+* Classification
+* Evaluation.
+
+Please see the notebook for the latest documentation on why certain label conversion is necessary for a particular experiment.
