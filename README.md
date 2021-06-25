@@ -2,11 +2,9 @@
 ## A Bayesian Convolutional Neural Network for acoustic mosquito prediction
 A BCNN prediction pipeline to discover mosquito sounds from audio.
 
-By Ivan Kiskin. Contact `ivankiskin1@gmail.com` for enquiries or suggestions.
-
 Model training, validation and testing strategy, and data available on: [HumBugDB](https://github.com/HumBug-Mosquito/HumBugDB).
 
-
+By Ivan Kiskin. Contact `ivankiskin1@gmail.com` for enquiries or suggestions.
 ### Installation
 ```
 git clone https://github.com/HumBug-Mosquito/DatabaseAccess.git
