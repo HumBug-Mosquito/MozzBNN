@@ -45,11 +45,11 @@ By default, the model outputs a text file of mosquito candidates with rows of th
 `Code/models/` contains a wide range of models that have been trained. By default, the model which performed best on our testbed is used.
 
 ### ECML-PKDD 2021
-If you are accessing this repo after discovering our ECML publication, [Automatic Acoustic Mosquito Tagging with Bayesian Neural Networks](tbc), and you wish to exactly replicate the experiments for the model in the paper, please visit [This link](link). Since acceptance in April 2021, the models and their training framework have been upgraded and improved. The latest model is included here as `Code/models/BNN/neurips_2021_humbugdb_keras_bnn_best.hdf5`, whereas the ECML paper describes `Code/models/BNN/Win_40_Stride_5_CNN_log-mel_128_norm_Falseheld_out_test_manual_v2_low_epoch.h5`. We strongly encourage you to visit [HumBugDB](https://github.com/HumBug-Mosquito/HumBugDB) for the most up-to-date data and training strategy. 
+If you are accessing this repo after discovering our ECML publication, [Automatic Acoustic Mosquito Tagging with Bayesian Neural Networks](tbc), and you wish to exactly replicate the experiments for the model in the paper, please see following [documentation](https://github.com/HumBug-Mosquito/MozzBNN/blob/master/Docs/ECML.md). Since acceptance in April 2021, the models and their training framework have been upgraded and improved. The latest model is included here as `Code/models/BNN/neurips_2021_humbugdb_keras_bnn_best.hdf5`, whereas the ECML paper describes `Code/models/BNN/Win_40_Stride_5_CNN_log-mel_128_norm_Falseheld_out_test_manual_v2_low_epoch.h5`. We strongly encourage you to visit [HumBugDB](https://github.com/HumBug-Mosquito/HumBugDB) for the most up-to-date data and training strategy. 
 
 
 
 ### Additional Documentation:
-* [ECML-PKDD model training, validation, testing (deprecated)](link.here)
-* [Database access (deprecated)](https://github.com/HumBug-Mosquito/DatabaseAccess/blob/master/Docs/legacy_database.md). Please vist latest version on: [HumBugDB](https://github.com/HumBug-Mosquito/HumBugDB).
+* [ECML-PKDD model training, validation, testing (deprecated)](https://github.com/HumBug-Mosquito/MozzBNN/blob/master/Docs/ECML.md)
+* [Database access (deprecated)](https://github.com/HumBug-Mosquito/DatabaseAccess/blob/master/Docs/legacy_database.md). Please visit latest version on: [HumBugDB](https://github.com/HumBug-Mosquito/HumBugDB).
 
