@@ -1,5 +1,6 @@
 import pandas as pd
 import os 
+import argparse
 
 def find_mozz_pred(df_path, file_out):
     df = pd.read_csv(df_path)
@@ -18,4 +19,13 @@ def find_mozz_pred(df_path, file_out):
     df.to_csv(file_out, index=False)
 
 if __name__ == '__main__':
-    find_mozz_pred('/humbug-data/CDC-LT-Tanzania/CDCLTphones.csv', '/humbug-data/CDC-LT-Tanzania/CDCLTphonesMozzPred.csv')
+    parser = argparse.ArgumentParser(description="""
+    Utility to help find predictions from original waveform files in the form of `path_filename.wav`.
+    Currently hardcoded to edit paths from locations of data on server, but may be modified to any.""")
+    parser.add_argument("dataframeSource", help="Source dataframe containing column `path` with filenames of candidate recordings.")
+    parser.add_argument("csvOut", help="Filename, including path, to save the original dataframe with an extra columns corresponding to found labels and predictions")
+   
+    args = parser.parse_args() 
+    dataframeSource = args.dataframeSource
+    csvOut = args.csvOut
+    find_mozz_pred(dataframeSource,csvOut)
