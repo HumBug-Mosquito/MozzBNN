@@ -8,4 +8,11 @@ See the main readme [link] for a description of general use and function argumen
 3. Add `export PATH=/opt/anaconda/anaconda3/bin:$PATH` to `/home/*user_name*/.bashrc` and `source ~/.bashrc` to load the environment in the current shell
 4. A prediction for all audio in a single day can be made with the following example command:
 ``` example command ```
-5. You may also use xyz to predict over yyy duration with the script:
+5. You may also use a script to automate command execution for several root folders, as can be found in `lib/pred_script.sh`. For example, to predict for all data with the datestamp of the 1st to 30th of November 2030, run:
+
+```#!/bin/bash
+for i in {01..30}
+do
+        python -W ignore predict.py --dir_out /home/ivank/dbmount/MozzWearPlot/2030-11-$i/ --to_dash True /home/ivank/dbmount/MozzWear/2030-11-$i/ .aac
+done 
+```
