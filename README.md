@@ -3,6 +3,7 @@
 A BCNN prediction pipeline to discover mosquito sounds from audio.
 
 Model training, validation and testing strategy, and data available on: [HumBugDB](https://github.com/HumBug-Mosquito/HumBugDB).
+* Documentation for running this system over **HumBug's dashboard** available [here](https://github.com/HumBug-Mosquito/MozzBNN/blob/master/Docs/HumBugDashboard.md).
 
 By Ivan Kiskin. Contact `ivankiskin1@gmail.com` for enquiries or suggestions.
 ### Installation
