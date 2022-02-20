@@ -24,19 +24,27 @@ pip install numba==0.48
 
 
 ### How to run
+#### Mosquito Event Detection
 `predict.py` is a command-line utility which accepts the arguments as given in `python predict.py -h`.
 From the directory `Code/lib`, execute in the command line `python predict.py [Optional arguments] rootFolderPath audio_format`.
+
+#### Mosquito Species Classification
+Species prediction is executed in the same fashion, using `python predict_species.py [Optional arguments] rootFolderPath audio_format` instead.
 
 #### Parameters
 Required parameters are the source directory `rootFolderPath` which contains audio files of format `audio_format`. Any files of that file format in any subdirectory will be analysed. Outputs are written to the optional argument `--dir_out`. The directory structure of the input will be mirrored with the root input directory replaced by `--dir_out`. If left blank, outputs are written to the same folders which contain audio. For a full list of optional parameters run `python predict.py -h`.
 
 ### Model output
+#### Mosquito Event Detection
 By default, the model outputs a text file of mosquito candidates with rows of the form `start_time stop_time   probability predictive_entropy mutual_information`. If you would like to generate an audio file which concatenates all of the detected segments to a new audio file, and parse meta labels to this file, set `--to_dash = True`. The labels were designed for import to [Audacity](https://www.audacityteam.org/) using the label import function in Audacity. The user has three options for visualising predictions:
 
 1. **Audacity**: load the original audio `filename.wav`, and import corresponding label predictions `filename+model_meta_information.txt`
 2. **Audacity**: load the detected mosquito candidates under `filename_mozz_pred.wav`, and import corresponding label predictions `filename_mozz_pred.txt`
 3. **Any media player**: load the generated mp4 video with mosquito candidates under `filename_mozz_pred.mp4`
 
+#### Mosquito Species Classification
+By default, the model outputs a text file of mosquito candidates with rows of the form `start_time stop_time   probability predictive_entropy mutual_information class_label`. Using prediction option `out_method=per_window` will output predictions over every feature window in the data, generating class probability outputs that sum to 1. `out_method=single` will output a single prediction consistining of probabilities per class over the entire audio input signal. These may be useful for shorter input signals. The labels were likewise designed for import with Audacity as follows:
+1. **Audacity**: load the original audio `filename.wav`, and import corresponding label predictions `filename+model_meta_information+species+out_method.txt`
 
 ### Structure
 `Code/lib/` contains `predict.py`, `util.py`, and `util_dashboard.py`
