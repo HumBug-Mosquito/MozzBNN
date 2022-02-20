@@ -10,7 +10,7 @@ import argparse
 import matplotlib.pyplot as plt
 
 def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5, n_samples=10, feat_type='log-mel',n_feat=128, win_size=30, step_size=30,
-                 n_hop=512, sr=8000, norm_per_sample=True, debug=False, to_dash=False, out_method='per_window'):
+                 n_hop=512, sr=8000, norm_per_sample=True, debug=False, out_method='per_window'):
 
         '''dir_out = None if we want to save files in the same folder that we read from.
            det_threshold=0.5 determines the threshold above which an event is classified as positive. See detect_timestamps for 
@@ -51,7 +51,7 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
 
 
                             y_to_timestamp = np.repeat(np.mean(out, axis=0), step_size, axis=0)
-                            print(y_to_timestamp)
+                            # print(y_to_timestamp)
                             G_X_to_timestamp = np.repeat(G_X, step_size, axis=0)
                             U_X_to_timestamp = np.repeat(U_X, step_size, axis=0)
                             preds_list = util_species.detect_timestamps_BNN(y_to_timestamp, G_X_to_timestamp, U_X_to_timestamp, 
@@ -78,14 +78,15 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
                             else:
                                 output_filename = filename # no file extension present
 
-                            text_output_filename = os.path.join(root_out, output_filename) + '_BNN_step_' + str(step_size) + '_samples_' + str(n_samples) + '_'+ str(model_name) + '.txt'
+                            text_output_filename = (os.path.join(root_out, output_filename) + '_BNN_step_' + str(step_size) + '_samples_' + str(n_samples) + '_'+ str(model_name) + 
+                                '_species_' + out_method + '.txt')
                             np.savetxt(text_output_filename, preds_list, fmt='%s', delimiter='\t')
 
-                            if not to_dash: 
-                                mozz_audio_filename, audio_length, has_mosquito = util_dash.write_audio_for_plot(text_output_filename, root, filename, output_filename, root_out, sr)
-                                if has_mosquito:
-                                    plot_filename = util_dash.plot_mozz_MI(X_CNN, y_to_timestamp[:,1], U_X_to_timestamp, 0.5, root_out, output_filename)
-                                    util_dash.write_video_for_dash(plot_filename, mozz_audio_filename, audio_length, root_out, output_filename)
+                            # if not to_dash: 
+                            #     mozz_audio_filename, audio_length, has_mosquito = util_dash.write_audio_for_plot(text_output_filename, root, filename, output_filename, root_out, sr)
+                            #     if has_mosquito:
+                            #         plot_filename = util_dash.plot_mozz_MI(X_CNN, y_to_timestamp[:,1], U_X_to_timestamp, 0.5, root_out, output_filename)
+                            #         util_dash.write_video_for_dash(plot_filename, mozz_audio_filename, audio_length, root_out, output_filename)
                     except Exception as e:
                         print("[ERROR] Unable to load {}".format(os.path.join(root, filename)))
                         print(e)
@@ -99,7 +100,7 @@ if __name__ == "__main__":
     parser.add_argument("rootFolderPath", help="Source destination of audio files. Can be a parent directory.")
     parser.add_argument("audio_format", help="Any file format supported by librosa load.")
     parser.add_argument("--dir_out", help="Output directory. If not specified, predictions are output to the same folder as source.")
-    parser.add_argument("--no_vid", action='store_true', help="Save predicted audio, video, and corresponding labels to same directory as dictated by dir_out.")
+    # parser.add_argument("--no_vid", action='store_true', help="Save predicted audio, video, and corresponding labels to same directory as dictated by dir_out.")
     parser.add_argument("--norm", default=True, help="Normalise feature windows with respect to themsleves.")
     parser.add_argument("--win_size", default=30, type=int, help="Window size.")
     parser.add_argument("--step_size", default=30, type=int, help="Step size.")
@@ -116,7 +117,7 @@ if __name__ == "__main__":
     rootFolderPath = args.rootFolderPath
     audio_format = args.audio_format
     dir_out = args.dir_out
-    no_vid = args.no_vid
+    # no_vid = args.no_vid
     win_size = args.win_size
     step_size = args.step_size
     n_samples = args.BNN_samples
@@ -125,4 +126,4 @@ if __name__ == "__main__":
 
 
     write_output(rootFolderPath, audio_format, dir_out=dir_out, norm_per_sample=norm_per_sample,
-                 win_size=win_size, step_size=step_size, to_dash=no_vid, n_samples=n_samples,out_method=out_method)
+                 win_size=win_size, step_size=step_size, n_samples=n_samples,out_method=out_method)
