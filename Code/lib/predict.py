@@ -78,7 +78,7 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
                             else:
                                 output_filename = filename # no file extension present
 
-                            text_output_filename = os.path.join(root_out, output_filename) + '_BNN_step_' + str(step_size) + '_samples_' + str(n_samples) + '_'+ str(model_name) + '.txt'
+                            text_output_filename = os.path.join(root_out, output_filename) + '_BNN_step_' + str(step_size) + '_samples_' + str(n_samples) + '_'+ str(model_name) + '_' + str(det_threshold) + '.txt'
                             np.savetxt(text_output_filename, preds_list, fmt='%s', delimiter='\t')
 
                             if to_dash: 
@@ -103,6 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("--win_size", default=30, type=int, help="Window size.")
     parser.add_argument("--step_size", default=30, type=int, help="Step size.")
     parser.add_argument("--BNN_samples", default=10, type=int, help="Number of MC dropout samples.")
+    parser.add_argument("--threshold", default=0.5, type=float, help="Detection threshold above which samples classified positive.")
 
 
     # dir_out=None, det_threshold=0.5, n_samples=10, feat_type='log-mel',n_feat=128, win_size=40, step_size=40,
@@ -118,7 +119,8 @@ if __name__ == "__main__":
     step_size = args.step_size
     n_samples = args.BNN_samples
     norm_per_sample=args.norm
+    det_threshold = args.threshold
 
 
     write_output(rootFolderPath, audio_format, dir_out=dir_out, norm_per_sample=norm_per_sample,
-                 win_size=win_size, step_size=step_size, to_dash=to_dash, n_samples=n_samples)
+                 win_size=win_size, step_size=step_size, to_dash=to_dash, n_samples=n_samples, det_threshold=det_threshold)
