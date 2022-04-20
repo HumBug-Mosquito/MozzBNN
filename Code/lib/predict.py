@@ -21,7 +21,8 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
        # model = keras.models.load_model('../models/BNN/Win_40_Stride_5_CNN_log-mel_128_norm_Falseheld_out_test_manual_v2_low_epoch.h5',
        #                                custom_objects={"dropout": 0.2})
        # model_name = 'held_out_test_manual_v2_low_epoch'
-        model = keras.models.load_model('../models/BNN/neurips_2021_humbugdb_keras_bnn_best.hdf5', custom_objects={"dropout": 0.2})
+        #model = keras.models.load_model('../models/BNN/neurips_2021_humbugdb_keras_bnn_best.hdf5', custom_objects={"dropout": 0.2})
+        model = keras.models.load_model('../models/BNN/neurips_2021_humbugdb_keras_bnn_best_vtf2',custom_objects={"dropout":0.2})
         model_name = 'neurips_2021_humbugdb_keras_bnn_best'
         mozz_audio_list = []
         
