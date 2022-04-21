@@ -20,7 +20,7 @@ def write_output(rootFolderPath, audio_format,  dir_out=None, det_threshold=0.5,
 
 
 
-        model = keras.models.load_model('../models/BNN/Win_30_Stride_5_2021_07_31_03_25_35-e69accuracy0.9608.hdf5', custom_objects={"dropout": 0.2}) # change this here.
+        model = keras.models.load_model('../models/BNN/Win_30_Stride_5_2021_07_31_03_25_35-e69accuracy0.9609_tf2', custom_objects={"dropout": 0.2}) # change this here.
         model_name = 'Win_30_Stride_5_2021_07_31_03_25_35-e69accuracy0.9608.hdf5' # change this
         mozz_audio_list = []
         
